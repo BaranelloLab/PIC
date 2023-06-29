@@ -33,7 +33,8 @@ strong_dir = dict()
 for line in tag_file.readlines()[1:]:
 	content = line.strip().split('\t')
 	tempcount = [float(i) for i in content[8:]]
-	if sum(tempcount) == 0:
+	#if sum(tempcount) == 0:
+        if sum(tempcount) < -1000:
 		continue
 	else:
 		TSSR = int(content[3]) - int(content[2])
@@ -42,9 +43,13 @@ for line in tag_file.readlines()[1:]:
 		InputTSS = float(content[9])
 		ChIPGB = float(content[10])
 		InputGB = float(content[11])
-		TSS_signal = (ChIPTSS - InputTSS)/TSSR
-		GB_signal = (ChIPGB - InputGB)/GBR
-		if TSS_signal < 0 or GB_signal < 0:
+		#Removed the normalization win Input for now as it creates problems like low Stalled signal at TSS
+                #TSS_signal = (ChIPTSS - InputTSS)/TSSR
+		#GB_signal = (ChIPGB - InputGB)/GBR
+                TSS_signal = (ChIPTSS)/TSSR
+                GB_signal = (ChIPGB)/GBR
+                #if TSS_signal < 0 or GB_signal < 0:
+		if TSS_signal < -1000 or GB_signal < -1000:
 			continue
 		else:
 			if GB_signal ==0:
