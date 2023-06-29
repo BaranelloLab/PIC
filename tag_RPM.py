@@ -25,6 +25,8 @@ for line in Input_BAM:
 	Input_total = line.strip()
 scaling_ChIP = float(float(ChIP_total)/1000000)
 scaling_Input = float(float(Input_total)/1000000)
+if scaling_Input == 0:
+    scaling_Input = 1
 print 'The scaling factor for ChIP is ', str(scaling_ChIP)
 print 'The scaling factor for Input is ', str(scaling_Input)
 
