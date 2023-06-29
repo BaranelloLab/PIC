@@ -28,11 +28,12 @@ chr_file.close()
 
 for line in annotation_file.readlines():
 	content = line.strip().split('\t')
-	if content[2] == 'transcript':
-		nameinfo = content[8].split(";")
+	#if content[2] == 'transcript': #change this 
+        if content[2] == 'transcript' and (int(content[4])-int(content[3])) > (args.GBdown + 1): #0 based. make sure that length of the gene is more than the amount of bases you set downstream
+                nameinfo = content[8].split(";")
 		chromosome = content[0]
-		location1 = content[3]
-		location2 = content[4]
+		location1 = content[3] #left end of gene
+		location2 = content[4] #right end of gene
 		score = content[5]
 		strand = content[6]
 		if not chromosome in chr_length:  #this is a check in order to abandon genes whose chr is not in the gsize file.
@@ -47,14 +48,16 @@ for line in annotation_file.readlines():
 		allgeneoutput.write(chromosome + '\t' + location1 + '\t' + location2 + '\t' + transcript_id + '\t' +
 							score + '\t' + strand + '\t' + gene_id + '\t' + gene_name + '\n')
 		if strand == '+':
-			start0 = int(location1) - args.TSSup + 1
+			start0 = int(location1) - args.TSSup + 1 
 			end0 = int(location1) + args.TSSdown - 1
 			if start0 < 0:
 				start0 = 0
 			allgenetss.write(chromosome + '\t' + str(start0) + '\t' + str(end0) + '\t' + transcript_id + '\t' + score + '\t' + strand + '\n')
-			start1 = end0
-			end1 = int(location2) + args.GBdown -1
-			if end1 > chr_length[chromosome]:
+			#start1 = end0
+			#end1 = int(location2) + args.GBdown -1 # change this to make it like in Cell 2016 paper. Genebody starts not from TSS, but downstream into genebody
+			start1 = int(location1) + args.GBdown -1
+                        end1 = int(location2)
+                        if end1 > chr_length[chromosome]:
 				end1 = chr_length[chromosome]			
 			allgenebody.write(chromosome + '\t' + str(start1) + '\t' + str(end1) + '\t' + transcript_id + '\t' + score + '\t' + strand + '\n')
 		elif strand == "-":
@@ -63,9 +66,11 @@ for line in annotation_file.readlines():
 			if start0 > chr_length[chromosome]:
 				start0 = chr_length[chromosome]
 			allgenetss.write(chromosome + '\t' + str(end0) + '\t' + str(start0) + '\t' + transcript_id + '\t' + score + '\t' + strand + '\n')
-			start1 = end0
-			end1 = int(location1) - args.GBdown + 1
-			if end1 < 0:
+			#start1 = end0
+			#end1 = int(location1) - args.GBdown + 1 # change this to make it like in Cell 2016 paper. Genebody starts not from TSS, but downstream into genebody
+			start1 = int(location2)-args.GBdown + 1
+                        end1 = int(location1)
+                        if end1 < 0:
 				end1 = 0
 			allgenebody.write(chromosome + '\t' + str(end1) + '\t' + str(start1) + '\t' + transcript_id + '\t' + score + '\t' + strand + '\n')
 
